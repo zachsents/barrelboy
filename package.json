@@ -1,0 +1,22 @@
+{
+    "name": "@zachsents/barrelboy",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "bin": {
+        "barrelboy": "./cli.js"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "zachsents",
+    "license": "ISC",
+    "type": "module",
+    "devDependencies": {
+        "glob": "^10.3.10"
+    },
+    "dependencies": {
+        "lodash.merge": "^4.6.2"
+    }
+}
