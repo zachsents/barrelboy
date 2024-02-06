@@ -18,9 +18,9 @@ export function createAccessors({
     })
 
     const list = Object.values(combined)
-    const object = Object.fromEntries(list.map(def => [def[idKey], def]))
+    const object = Object.fromEntries(list.map(def => [def.id, def]))
     const _resolveId = (...segments) => resolveId(typePrefix, ...segments)
-    const resolve = (...segments) => object[resolveId(...segments)]
+    const resolve = (...segments) => object[resolveId(typePrefix, ...segments)]
 
     return { list, object, resolveId: _resolveId, resolve }
 }

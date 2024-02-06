@@ -1,6 +1,6 @@
 {
     "name": "@zachsents/barrelboy",
-    "version": "1.0.18",
+    "version": "1.0.27",
     "description": "",
     "main": "index.js",
     "bin": {
@@ -10,10 +10,9 @@
     "author": "zachsents",
     "license": "ISC",
     "type": "module",
-    "devDependencies": {
-        "glob": "^10.3.10"
-    },
+    "devDependencies": {},
     "dependencies": {
+        "glob": "^10.3.10",
         "lodash.merge": "^4.6.2"
     }
 }

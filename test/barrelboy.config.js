@@ -9,10 +9,13 @@ export default createConfig({
     ],
     accessors: [
         {
+            name: "access",
             barrels: "all",
-            name: "index",
             typePrefix: "def",
         }
     ],
     openAfterCreate: "def",
+    commonBarrelSettings: {
+        outputDirectory: "_barrels",
+    }
 })

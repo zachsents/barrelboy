@@ -4,16 +4,26 @@ import path from "path"
 import { findConfig } from "./config.js"
 
 
+
 export async function build() {
     const config = await findConfig()
 
     await Promise.all(config.barrels.map(async barrel => {
+        await fs.mkdir(barrel.outputDirectory, { recursive: true })
+
         const globPattern = barrel.glob ?? `${barrel.baseDirectory}/**/${barrel.name}.${barrel.extension}`
-        const filePaths = await glob(globPattern, { ignore: barrel.exclude })
+        const filePaths = await glob(globPattern, { ignore: ["node_modules/**", ...barrel.exclude] })
+
+        const barrelContent = filePaths.map(filePath => {
+            const importPath = toImportPath(path.relative(barrel.outputDirectory, filePath))
+            const exportName = path.dirname(filePath).split("\\").map(dashToCamel).join("_")
+
+            return `export { default as ${exportName} } from "${importPath}"`
+        }).join("\n")
 
         await fs.writeFile(
             path.join(barrel.outputDirectory, `${barrel.name}-barrel.js`),
-            filePaths.map(createExport).join("\n")
+            barrelContent
         )
 
         console.log(`[${barrel.name}] Barreled ${filePaths.length} files`)
@@ -54,8 +64,8 @@ async function buildAccessor(config, {
 } = {}) {
     const imports = barrels.map(barrelName => {
         const barrelConfig = config.barrels.find(b => b.name === barrelName)
-        const importPath = "./" + path.join(barrelConfig.outputDirectory, `${barrelConfig.name}-barrel.js`).replaceAll("\\", "/")
-        return `import * as ${barrelName} from "${importPath}"`
+        const importPath = toImportPath(path.join(barrelConfig.outputDirectory, `${barrelConfig.name}-barrel.js`))
+        return `import * as ${barrelName} from "${importPath.replaceAll("\\", "/")}"`
     })
 
     await fs.writeFile(`./${name}.js`, `${imports.join("\n")}
@@ -74,18 +84,14 @@ export { list, object, resolveId, resolve }`)
 }
 
 
-/**
- * @param {string} filePath
- */
-function createExport(filePath) {
-    const importPath = `./${filePath.replaceAll("\\", "/")}`
-    const exportName = path.dirname(filePath).split("\\").map(dashToCamel).join("_")
-
-    return `export { default as ${exportName} } from "${importPath}"`
-}
-
-
 function dashToCamel(str) {
     const segments = str.split("-")
     return segments[0].toLowerCase() + segments.slice(1).map(seg => seg[0].toUpperCase() + seg.slice(1)).join("")
+}
+
+
+function toImportPath(p) {
+    let result = path.normalize("./" + path.normalize(p))
+    result = result.startsWith(".") ? result : "./" + result
+    return result.replaceAll("\\", "/")
 }

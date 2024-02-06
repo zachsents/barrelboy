@@ -12,19 +12,21 @@ export async function create({
     const dir = ".\\" + segments.join("\\")
     await fs.mkdir(dir, { recursive: true })
 
-    const wholePath = name => path.join(dir, `${name}.js`)
+    const wholePath = barrel => path.join(dir, `${barrel.name}.${barrel.extension}`)
 
     await Promise.all(
         config.barrels
             .filter(barrel => typeof barrel.template === "string")
-            .map(barrel => fs.writeFile(wholePath(barrel.name), barrel.template, {
+            .map(barrel => fs.writeFile(wholePath(barrel), barrel.template, {
                 flag: "wx"
             }).catch(() => { }))
     )
 
     if (config.openAfterCreate) {
         await new Promise((resolve, reject) => {
-            exec(`code ${wholePath(config.openAfterCreate)}`, (error) => {
+            const barrel = config.barrels.find(barrel => barrel.name === config.openAfterCreate)
+
+            exec(`code ${wholePath(barrel)}`, (error) => {
                 if (error) {
                     reject(error)
                 } else {
