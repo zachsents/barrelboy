@@ -16,7 +16,7 @@ export async function build() {
 
         const barrelContent = filePaths.map(filePath => {
             const importPath = toImportPath(path.relative(barrel.outputDirectory, filePath))
-            const exportName = path.dirname(filePath).split("\\").map(dashToCamel).join("_")
+            const exportName = path.dirname(filePath).split(/[\\/]/g).map(dashToCamel).join("_")
 
             return `export { default as ${exportName} } from "${importPath}"`
         }).join("\n")
