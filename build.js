@@ -79,7 +79,7 @@ export { list, object, resolveId, resolve }`)
  */
 function createExport(filePath) {
     const importPath = `./${filePath.replaceAll("\\", "/")}`
-    const exportName = path.dirname(filePath).split("\\").map(dashToCamel).join("_")
+    const exportName = path.dirname(filePath).split(/[\\/]/g).map(dashToCamel).join("_")
 
     return `export { default as ${exportName} } from "${importPath}"`
 }
